@@ -619,7 +619,7 @@
     var photos = messages.filter(function(m){ return m.photo; });
     grid.innerHTML = '';
     if (!photos.length){
-      grid.innerHTML = '<p class="archives-empty">Chưa có ảnh nào được lưu trong Yearbook.</p>';
+      grid.innerHTML = '<p class="archives-empty"></p>';
       return;
     }
     photos.forEach(function(m){
