@@ -151,18 +151,7 @@
   .invite-medallion .placeholder{
     display:none;
   }
-  .invite-medallion label,
-  .invite-medallion input[type=file]{
-    display:none;
-  }
   .invite-medallion .placeholder svg{width:34px;height:34px;stroke:var(--rose-deep);}
-  .invite-medallion label{
-    position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;
-    padding-bottom:8px;background:linear-gradient(0deg, rgba(0,0,0,0.45), transparent 55%);
-    color:#fff;font-size:10.5px;font-weight:600;cursor:pointer;opacity:0;transition:opacity .2s;
-  }
-  .invite-medallion:hover label{opacity:1;}
-  .invite-medallion input[type=file]{display:none;}
 
   .invite-title{font-size:clamp(30px,5vw,42px);line-height:1.1;}
   .invite-of{
@@ -210,15 +199,7 @@
     background:var(--bg);color:var(--rose-deep);font-size:14px;padding:0 14px;
   }
 
-  /* ---------- Countdown ---------- */
-  .countdown{display:flex;gap:16px;flex-wrap:wrap;}
-  .count-cell{
-    flex:1 1 110px;background:var(--surface);border:1px solid var(--line);border-radius:20px;
-    padding:22px 10px;text-align:center;box-shadow:var(--shadow);
-  }
-  .count-cell .num{font-family:'Fraunces',serif;font-size:clamp(30px,5vw,40px);color:var(--rose-deep);}
-  .count-cell .lbl{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
-
+  
   /* ---------- Details ---------- */
   .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
   @media (max-width:640px){ .detail-grid{grid-template-columns:1fr;} }
@@ -234,8 +215,7 @@
   .map-link{margin-top:12px;font-size:14px;color:var(--rose-deep);text-decoration:none;}
 
 
-  .archives-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  @media (max-width:640px){.archives-grid{grid-template-columns:repeat(2,1fr);}}
+  .archives-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
   .archive-photo{aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--blush-soft);border:1px solid var(--line);}
   .archive-photo img{width:100%;height:100%;object-fit:cover;}
   .archives-empty{color:var(--ink-soft);font-size:15px;}
@@ -384,8 +364,6 @@
           <div class="placeholder" id="heroPlaceholder">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>
           </div>
-          <label for="heroPhotoInput">Gắn ảnh</label>
-          <input type="file" id="heroPhotoInput" accept="image/*">
         </div>
 
         <div class="eyebrow">Trân trọng kính mời</div>
@@ -396,7 +374,7 @@
         <div class="invite-rule"></div>
 
         <div class="invite-date">Saturday, 26th September 2026</div>
-        <p class="invite-lede">Một chặng đường đã khép lại thật đẹp — và sẽ trọn vẹn hơn nữa nếu có anh/chị/bạn bè cùng chung vui trong ngày đặc biệt này của tớ.</p>
+        <p class="invite-lede">Một chặng đường đã khép lại thật đẹp — và sẽ trọn vẹn hơn nữa nếu có anh/chị/bạn bè/các em cùng chung vui trong ngày đặc biệt này của tớ.</p>
 
         <div class="cta-row">
           <a href="#chi-tiet" class="btn btn-primary">Xem thông tin</a>
@@ -417,7 +395,7 @@
       <div class="section-head">
         <div class="eyebrow"><h2>Thông tin</h2></div>
         <h2>Mời mọi người đến chung vui với tớ</h2>
-        <p>Sự hiện diện của anh/chị/bạn bè là một phần thật đẹp của ngày đáng nhớ này.</p>
+        <p>Sự hiện diện của anh/chị/bạn bè/các em là một phần thật đẹp của ngày đáng nhớ này của tớ .</p>
       </div>
       <div class="detail-grid">
         <div class="detail-card"><div class="k">Ngày tổ chức</div><div class="v">Thứ Bảy, 26 tháng 9 năm 2026</div></div>
@@ -488,7 +466,7 @@
       <div class="section-head">
         <div class="eyebrow"><h2>Archives</h2> </div>
         
-        <p>Những bức ảnh kỉ niệm của tớ với các cậu sẽ hiện thị tại sau khi cậu điền xong Guestbook cho tớ :>></p>
+        <p>Những bức ảnh kỉ niệm của tớ với các cậu sẽ hiện thị tại đây sau khi cậu điền xong Guestbook cho tớ :>></p>
       </div>
       <div class="archives-grid" id="archivesGrid"></div>
     </div>
@@ -527,6 +505,11 @@
 (function(){
   "use strict";
 
+  // Supabase public configuration. Không dùng service_role/secret key ở frontend.
+  var SUPABASE_URL = 'https://sgmwnothotuskzddppjj.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_oYBK7mhkHWB5rivLKKZI2g_7LIXWOai';
+  var SUPABASE_BUCKET = 'guestbook-photos';
+
   var toastEl = document.getElementById('toast');
   var toastTimer;
   function toast(msg){
@@ -559,15 +542,10 @@
     }
   });
 
-  // Ảnh đại diện được gắn cố định từ thư mục images/, không cho khách thay đổi.
-
-
-  
-  
-   
-     
+    // Ảnh đại diện và ảnh lời cảm ơn được gắn cố định trong HTML.
 
   // ---------- Thank-you PNG ----------
+
   // Ảnh được gắn cố định trong HTML, không cho khách thay đổi.
 
 
@@ -594,65 +572,119 @@
     });
   }
 
-  function renderMessages(){
-    var list = document.getElementById('msgList');
-    var messages = load('grad_guestbook', []) || [];
-    list.innerHTML = '';
+  function supabaseRequest(path, options){
+    options = options || {};
+    options.headers = Object.assign({
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }, options.headers || {});
+    return fetch(SUPABASE_URL + path, options).then(function(response){
+      return response.text().then(function(body){
+        var data = null;
+        if (body) {
+          try { data = JSON.parse(body); }
+          catch (parseError) { throw new Error('Supabase trả về dữ liệu không hợp lệ.'); }
+        }
+        if (!response.ok) {
+          var detail = data && (data.message || data.error || data.hint || data.details);
+          throw new Error('Supabase ' + response.status + (detail ? ': ' + detail : ''));
+        }
+        return data;
+      });
+    });
+  }
 
+  function getMessages(){
+    return supabaseRequest('/rest/v1/guestbook?select=id,name,message,photo_url,created_at&order=created_at.desc')
+      .then(function(rows){ return rows || []; });
+  }
+
+  function renderMessages(messages){
+    var list = document.getElementById('msgList');
+    list.innerHTML = '';
     messages.forEach(function(m){
       var card = document.createElement('article');
       card.className = 'msg-card';
       card.innerHTML = '<div class="avatar">' + escapeHtml((m.name || 'Q').charAt(0).toUpperCase()) + '</div>' +
         '<div class="body">' +
           '<div class="name">' + escapeHtml(m.name || 'Một người bạn') + '</div>' +
-          '<div class="title">Đã gửi lời chúc đến Quanh</div>' +
-          '<div class="text">' + escapeHtml(m.text) + '</div>' +
-          (m.photo ? '<div class="photo"><img src="' + m.photo + '" alt="Ảnh kèm theo lời chúc"></div>' : '') +
+          '<div class="text">' + escapeHtml(m.message) + '</div>' +
         '</div>';
       list.appendChild(card);
     });
   }
 
-  function renderArchives(){
+  function renderArchives(messages){
     var grid = document.getElementById('archivesGrid');
-    var messages = load('grad_guestbook', []) || [];
-    var photos = messages.filter(function(m){ return m.photo; });
+    var photos = messages.filter(function(m){ return m.photo_url; });
     grid.innerHTML = '';
     if (!photos.length){
-      grid.innerHTML = '<p class="archives-empty"></p>';
+      grid.innerHTML = '<p class="archives-empty">Chưa có ảnh nào được gửi.</p>';
       return;
     }
     photos.forEach(function(m){
       var item = document.createElement('div');
       item.className = 'archive-photo';
-      item.innerHTML = '<img src="' + m.photo + '" alt="Ảnh lưu từ Yearbook">';
+      item.innerHTML = '<img src="' + encodeURI(m.photo_url) + '" alt="Ảnh lưu từ Guestbook">';
       grid.appendChild(item);
     });
   }
 
-  // Lời chúc vẫn được lưu lại nhưng không hiển thị bên dưới form.
-  renderArchives();
+  function refreshGuestbook(){
+    return getMessages().then(function(messages){
+      renderMessages(messages);
+      renderArchives(messages);
+    }).catch(function(){
+      toast('Không thể tải Guestbook. Hãy kiểm tra cấu hình Supabase.');
+    });
+  }
+
+  // Hiển thị dữ liệu chung từ Supabase cho tất cả khách truy cập.
+  refreshGuestbook();
 
   document.getElementById('guestForm').addEventListener('submit', function(e){
     e.preventDefault();
+    var form = this;
     var text = document.getElementById('gbText').value.trim();
+    var name = document.getElementById('gbName').value.trim();
     if (!text) return;
-    var entry = {
-      name: document.getElementById('gbName').value.trim(),
-      title: '',
-      text: text,
-      photo: gbThumbData
-    };
-    var arr = load('grad_guestbook', []);
-    arr.unshift(entry);
-    save('grad_guestbook', arr);
-    // Không hiển thị nội dung lời chúc tại Guestbook.
-    renderArchives();
-    document.getElementById('guestThanks').classList.add('show');
-    this.reset();
-    gbThumbData = null;
-    gbThumb.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--rose-deep)"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>';
-    toast('Đã gửi lời chúc, cảm ơn bạn!');
+    var submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+
+    function saveEntry(photoUrl){
+      return supabaseRequest('/rest/v1/guestbook', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+        body: JSON.stringify({name: name, message: text, photo_url: photoUrl})
+      });
+    }
+
+    var uploadPromise = Promise.resolve(null);
+    if (gbThumbData) {
+      var file = gbPhotoInput.files[0];
+      var fileName = Date.now() + '-' + Math.random().toString(36).slice(2) + '.' +
+        ((file.name.split('.').pop() || 'jpg').replace(/[^a-z0-9]/gi, ''));
+      uploadPromise = fetch(SUPABASE_URL + '/storage/v1/object/' + SUPABASE_BUCKET + '/' + fileName, {
+        method: 'POST',
+        headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': file.type},
+        body: file
+      }).then(function(response){
+        if (!response.ok) throw new Error('Upload failed');
+        return SUPABASE_URL + '/storage/v1/object/public/' + SUPABASE_BUCKET + '/' + fileName;
+      });
+    }
+
+    uploadPromise.then(saveEntry).then(function(){
+      refreshGuestbook();
+      document.getElementById('guestThanks').classList.add('show');
+      form.reset();
+      gbThumbData = null;
+      gbThumb.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--rose-deep)"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>';
+      toast('Đã gửi lời chúc, cảm ơn bạn!');
+    }).catch(function(error){
+      console.error('Guestbook submit error:', error);
+      toast('Gửi chưa thành công: ' + (error.message || 'lỗi Supabase'));
+    }).then(function(){ submitButton.disabled = false; });
   });
 
 })();
